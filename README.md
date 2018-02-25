@@ -6,7 +6,7 @@ D4 wavelet transform implementation for Common Lisp
 Wavelet transform is just like Fourier transform defined by
 ![equation](https://latex.codecogs.com/gif.latex?F(z)%20%3D%20%5Cint_%7B-%5Cinfty%7D%5E%7B%5Cinfty%7Df(x)e%5E%7Bixz%7Ddx).
 
-This transform gives you a "frequency representation" of a function, but as you can see, you lose all time information (i.e. you cannot tell where exaclty a
+This transform gives you a "frequency representation" of a function, but as you can see, you lose all time information (i.e. you cannot tell where exactly a
 signal of some certain frequency is localized in time). Wavelet transform saves both time and frequency information. It is defined so:
 
 ![equation](https://latex.codecogs.com/gif.latex?F(a%2Cb)%20%3D%20%5Cint_%7B-%5Cinfty%7D%5E%7B%5Cinfty%7Df(x)%5Cpsi(%7B%7Bx-b%7D%20%5Cover%20%7Ba%7D%7D)dx) 
@@ -25,19 +25,23 @@ some desired precision). Daubechies D4 wavelet is such a function ψ(x) with com
 which ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) constitute an
 orthonormal basis on ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D).
 
+
 ## What is Multiresolution Analysis?
 
-Consider ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) defined by
-![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)%20%3D%202%7D%5E%7B-m%2F2%7D%5Cpsi(2%5E%7B-m%7Dx%20-%20n))
-This is the same ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) defined
-earlier with
+Multiresolution Analysis is a tool to construct an orthonormal basis on
+![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D) with desired properties. All you need
+is a proper function ϕ(x) which is orthogonal to its translations and satisfies a certain equation,
+called dilation equation (more on this later).
+
+Consider now ![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D(x)) defined by
+![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D(x)%20%3D%202%7D%5E%7B-m%2F2%7D%5Cphi(2%5E%7B-m%7Dx%20-%20n)).
+This is like a previous definition for ψ(x) with
 ![equation](https://latex.codecogs.com/gif.latex?a_%7B0%7D%20%3D%202%2C%20b_%7B0%7D%20%3D%201).
 
 Multiresolution Analysis is a set of spaces
 ![equation](https://latex.codecogs.com/gif.latex?%5Cldots%2CV_%7B-2%7D%2CV_%7B-1%7D%2CV_%7B0%7D%2CV_%7B1%7D%2CV_%7B2%7D%2C%5Cldots)
 all of them being some closed subspace of
-![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D). They are called multiresolution
-analysis if:
+![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D). They also satisfy the following:
 
  - ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%2B1%7D%20%5Csubset%20V_%7Bn%7D)
  - ![equation](https://latex.codecogs.com/gif.latex?%5Cbigcup_%7Bn%7D%20V_%7Bn%7D) is dense in ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D)
@@ -48,10 +52,11 @@ analysis if:
    ![equation](https://latex.codecogs.com/gif.latex?%5Cleft%5C%7B%5Cphi_%7B0%2Ck%7D%3A%20k%20%5Cin%20%5Cmathbb%7BZ%7D%5Cright%5C%7D)
    is an orthonormal basis in ![equation](https://latex.codecogs.com/gif.latex?V_%7B0%7D).
 
-![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D(x)) are defined by
-![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D(x)%20%3D%202%7D%5E%7B-m%2F2%7D%5Cphi(2%5E%7B-m%7Dx%20-%20n)). For
-every ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) there is its orthonormal
-complement ![equation](https://latex.codecogs.com/gif.latex?W_%7Bn%7D) in
+You can see, that if ![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7B0%2Cn%7D(x)) defined
+above is in ![equation](https://latex.codecogs.com/gif.latex?V_%7B0%7D), then
+![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D%20%5Cin%20V_%7Bm%7D). For every
+![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) there is its orthonormal complement
+![equation](https://latex.codecogs.com/gif.latex?W_%7Bn%7D) in
 ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn-1%7D) so
 ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn-1%7D%20%3D%20V_%7Bn%7D%20%5Coplus%20W_%7Bn%7D),
 where ![equation](https://latex.codecogs.com/gif.latex?W_%7Bn%7D) are orthogonal to each other. The
@@ -59,8 +64,10 @@ whole functional space is then can be represented as
 ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D%20%3D%20%5Cbigoplus_%7Bn%3D-%5Cinfty%7D%5E%7B%5Cinfty%7DW_%7Bn%7D). Usually
 we do not care about all ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D) and some
 "fine scaled" ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) which will give "close"
-representation of out signal is OK for us. Then we can get
+representation of our signal is OK for us. Then we can get
 ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D%20%3D%20V_%7BN%7D%20%5Coplus%20(%5Cbigoplus_%7Bk%3D0%7D%5E%7BN-n-1%7DW_%7BN-k%7D)).
+What's important, is that we can define
+![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)%20%3D%202%7D%5E%7B-m%2F2%7D%5Cpsi(2%5E%7B-m%7Dx%20-%20n)).
 Scaled versions of ψ(x), ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) are
 in 
 ![equation](https://latex.codecogs.com/gif.latex?W_%7Bm%7D) respectively and shifted versions of
@@ -69,7 +76,14 @@ basis in that ![equation](https://latex.codecogs.com/gif.latex?W_%7Bm%7D). Toget
 some "coarse" scale, these finer scaled and shifted versions of ψ(x) form a basis in some space
 ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) which is "closer" to
 ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D) when more finer scales of ψ(x) are
-taken into consideration.
+taken into consideration. You will achieve
+![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D) when infinitely many scales are
+taken. This resembles Fourier series where reconstructed function is closer to the original if you
+take more elements
+![equation](https://latex.codecogs.com/gif.latex?a_%7Bk%7D%5Ccos%20%7B%7B2%5Cpi%20k%7D%20%5Cover%20%7BL%7D%7Dx)
+and
+![equation](https://latex.codecogs.com/gif.latex?b_%7Bk%7D%5Csin%20%7B%7B2%5Cpi%20k%7D%20%5Cover%20%7BL%7D%7Dx)
+(i.e. elements with higher k). You can consider k as a "scale" for sine and cosine functions.
 
 With all proof skipped I will state that if
 ![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20(x)%20%3D%20%5Csum_%7Bn%3D-%5Cinfty%7D%5E%7B%5Cinfty%7Dh_%7Bn%7D%5Cphi(2x-n))
@@ -78,7 +92,18 @@ analysis for it and
 ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi%20(x)%20%3D%20%5Csum_%7Bn%3D-%5Cinfty%7D%5E%7B%5Cinfty%7Dd_%7Bn%7D%5Cphi(2x-n))
 where
 ![equation](https://latex.codecogs.com/gif.latex?d_%7Bn%7D%20%3D%20(-1)%5E%7Bn-1%7Dh_%7B-n-1%7D) is
-in ![equation](https://latex.codecogs.com/gif.latex?W_%7B0%7D).
+in ![equation](https://latex.codecogs.com/gif.latex?W_%7B0%7D). This reccurent equation for ϕ(x) is
+called a dilation equation. Now, having ψ(x) you can construct a basis on
+![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D) with functions
+![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)). Or you can use ϕ(x) as a
+"starting point" for your basis and
+![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) with nonpositive m
+(i.e. ![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20(x-n)),
+![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20(2x-n)),
+![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20(4x-n)) and so on). Or
+you can use a finite set of ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x))
+if ψ(x) and your signal have a compact support (this limits a possible number of n) and you desire
+to reconstruct your signal up to some precision (this limits m, i.e. number of scales which you use).
 
 The best example (because of its simplicity) is ![equation](https://latex.codecogs.com/gif.latex?%5Cphi(x)%20%3D%20%5Cchi%20%5B0%3B%201%5D) (equals one on [0;1], zero
 otherwise). This particular
