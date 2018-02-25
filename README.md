@@ -1,7 +1,7 @@
 D4 wavelet transform implementation for Common Lisp
 ====================
 
-# What is a wavelet transform?
+## What is a wavelet transform?
 
 Wavelet transform is just like Fourier transform defined by
 ![equation](https://latex.codecogs.com/gif.latex?F(z)%20%3D%20%5Cint_%7B-%5Cinfty%7D%5E%7B%5Cinfty%7Df(x)e%5E%7Bixz%7Ddx).
@@ -25,7 +25,7 @@ some desired precision). Daubechies D4 wavelet is such a function ψ(x) with com
 which ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) constitute an
 orthonormal basis on ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D).
 
-# What is Multiresolution Analysis?
+## What is Multiresolution Analysis?
 
 Consider ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) defined by
 ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)%20%3D%202%7D%5E%7B-m%2F2%7D%5Cpsi(2%5E%7B-m%7Dx%20-%20n))
@@ -44,18 +44,32 @@ analysis if:
  - ![equation](https://latex.codecogs.com/gif.latex?%5Cbigcap_%7Bn%7D%20V_%7Bn%7D%20%3D%20%5Cleft%5C%7B0%5Cright%5C%7D)
  - ![equation](https://latex.codecogs.com/gif.latex?f%20%5Cin%20V_%7Bn%7D) if and only if ![equation](https://latex.codecogs.com/gif.latex?f(2%5E%7Bn%7D%5Ccdot)%20%5Cin%20V_%7B0%7D)
  - There exists a function
- - ![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20%5Cin%20V_%7B0%7D) such that
- - ![equation](https://latex.codecogs.com/gif.latex?%5Cleft%5C%7B%5Cphi_%7B0%2Ck%7D%3A%20k%20%5Cin%20%5Cmathbb%7BZ%7D%5Cright%5C%7D)
- - is an orthonormal basis in ![equation](https://latex.codecogs.com/gif.latex?V_%7B0%7D).
+   ![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20%5Cin%20V_%7B0%7D) such that
+   ![equation](https://latex.codecogs.com/gif.latex?%5Cleft%5C%7B%5Cphi_%7B0%2Ck%7D%3A%20k%20%5Cin%20%5Cmathbb%7BZ%7D%5Cright%5C%7D)
+   is an orthonormal basis in ![equation](https://latex.codecogs.com/gif.latex?V_%7B0%7D).
 
 ![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D(x)) are defined by
- ![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D(x)%20%3D%202%7D%5E%7B-m%2F2%7D%5Cphi(2%5E%7B-m%7Dx%20-%20n)). For
- every ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) there is its orthonormal
- complement ![equation](https://latex.codecogs.com/gif.latex?W_%7Bn%7D) in
- ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%2B1%7D) so
- ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%2B1%7D%20%3D%20V_%7Bn%7D%20%5Coplus%20W_%7Bn%7D). The
- whole functional space is then can be represented as
- ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D%20%3D%20V_%7B0%7D%20%5Coplus%20(%5Cbigoplus_%7Bn%3D-%5Cinfty%7D%5E%7B0%7DW_%7Bn%7D)).
+![equation](https://latex.codecogs.com/gif.latex?%5Cphi_%7Bm%2Cn%7D(x)%20%3D%202%7D%5E%7B-m%2F2%7D%5Cphi(2%5E%7B-m%7Dx%20-%20n)). For
+every ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) there is its orthonormal
+complement ![equation](https://latex.codecogs.com/gif.latex?W_%7Bn%7D) in
+![equation](https://latex.codecogs.com/gif.latex?V_%7Bn-1%7D) so
+![equation](https://latex.codecogs.com/gif.latex?V_%7Bn-1%7D%20%3D%20V_%7Bn%7D%20%5Coplus%20W_%7Bn%7D),
+where ![equation](https://latex.codecogs.com/gif.latex?W_%7Bn%7D) are orthogonal to each other. The
+whole functional space is then can be represented as
+![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D%20%3D%20%5Cbigoplus_%7Bn%3D-%5Cinfty%7D%5E%7B%5Cinfty%7DW_%7Bn%7D). Usually
+we do not care about all ![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D) and some
+"fine scaled" ![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) which will give "close"
+representation of out signal is OK for us. Then we can get
+![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D%20%3D%20V_%7BN%7D%20%5Coplus%20(%5Cbigoplus_%7Bk%3D0%7D%5E%7BN-n-1%7DW_%7BN-k%7D)).
+Scaled versions of ψ(x), ![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) are
+in 
+![equation](https://latex.codecogs.com/gif.latex?W_%7Bm%7D) respectively and shifted versions of
+![equation](https://latex.codecogs.com/gif.latex?%5Cpsi_%7Bm%2Cn%7D(x)) with some fixed m form a
+basis in that ![equation](https://latex.codecogs.com/gif.latex?W_%7Bm%7D). Together with ϕ(x) on
+some "coarse" scale, these finer scaled and shifted versions of ψ(x) form a basis in some space
+![equation](https://latex.codecogs.com/gif.latex?V_%7Bn%7D) which is "closer" to
+![equation](https://latex.codecogs.com/gif.latex?L%5E%7B2%7D) when more finer scales of ψ(x) are
+taken into consideration.
 
 With all proof skipped I will state that if
 ![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20(x)%20%3D%20%5Csum_%7Bn%3D-%5Cinfty%7D%5E%7B%5Cinfty%7Dh_%7Bn%7D%5Cphi(2x-n))
@@ -78,7 +92,7 @@ wavelet.
 
 ϕ(x) is called a scaling function and ψ(x) is a mother wavelet.
 
-# What is Daubechies D4 wavelet?
+## What is Daubechies D4 wavelet?
 
 D4 wavelet is a compactly supported orthonormal wavelet. Because it is compactly supported, there
 is only a finite number (four exactly) of non-zero coefficients in
@@ -97,7 +111,7 @@ with a wavelet having n vanishing moments compared to wavelet having less than n
 moments. Also it has a property that
 ![equation](https://latex.codecogs.com/gif.latex?%5Cint_%7B-%5Cinfty%7D%5E%7B%5Cinfty%7D%20%5Cphi(x)%20dx%20%3D%201)
 
-# So what is this all about?
+## So what is this all about?
 
 Here, we are close to cause of our short intro to wavelets. Namely, we want to transform a signal to
 its wavelet representation and back. As for any orthonormal basis normally we would calculate scalar
@@ -133,7 +147,7 @@ to get two values
 and so on until we restore
 ![equation](https://latex.codecogs.com/gif.latex?%5Clangle%20f(x)%2C%20%5Cphi(x-n)%5Crangle%20%3D%20f_%7Bn%7D).
 
-# Lisp implementation.
+## Lisp implementation.
 
 In this lisp library there is `d4-wavelet-transform` package which consists of `transform` and
 `inverse-transform` functions. Also, remember, that any orthonormal basis weakly converges to zero,
@@ -144,3 +158,9 @@ precision" with `lose-precision`. This function zeroes all coefficients which ar
 zero and therefore imitates some compression of input signal. There is `generate-sin` function,
 which can get you sinusoidal signal, on which you can test `transform`. Also there is `array2file`
 function which can store your signal in the form which is understood by gnuplot.
+
+## Useful reading
+ - [A Linear Algebra View of the Wavelet Transform](http://www.bearcave.com/misl/misl_tech/wavelets/matrix/index.html)
+ - Ten Lectures on Wavelets, Ingrid Daubechies
+ - Introduction to Hilbert Spaces with Applications, Third Edition by Lokenath Debnath, Piotr
+ Mikusinski
